@@ -1,0 +1,18 @@
+<div class="welcome-wrapper">
+  <ng-container *ngIf="appInfo$ | async as info; else loading">
+    <p> Bienvenido a </p>
+    <h4>{{ info?.appname || 'DamaDQ' }}</h4>
+
+    <div class="db-notes" *ngIf="info?.appnotes">
+      {{ info.appnotes }}
+    </div>
+    <br>
+    <div class="db-notes" *ngIf="info?.apptext"
+      [innerHTML]="info.apptext">
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <h4>Cargando...</h4>
+  </ng-template>
+</div>

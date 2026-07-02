@@ -1,0 +1,14 @@
+<nav class="sidebar">
+  <ul class="nav-list" *ngIf="nav$ | async as nav; else loading">
+    <li *ngFor="let item of nav">
+      <a [routerLink]="item.route" routerLinkActive="active-link" class="nav-link">
+        <span class="material-icons">{{ item.icon }}</span>
+        <span class="label">{{ item.label }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <ng-template #loading>
+    <div class="muted">Cargando menú…</div>
+  </ng-template>
+</nav>

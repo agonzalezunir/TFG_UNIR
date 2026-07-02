@@ -1,0 +1,169 @@
+<section class="conf">
+  <h2>Reglas</h2>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Reglas</h3>
+      <small class="muted">Listado</small>
+      <button type="button" class="btn-custom" (click)="newRule()">Nueva regla</button>
+    </div>
+
+
+    <div class="toolbar">
+      <label class="filter">
+        <label for="status-select">Categoría:</label>
+        <select class="custom-select" (change)="onCategoryChange($any($event.target).value)">
+          <option value="">Todas</option>
+          <option *ngFor="let c of (category$ | async)" [value]="c.categoryid">
+            {{ c.category }}
+          </option>
+        </select>
+      </label>
+      &nbsp;
+      <label class="filter">
+        <label for="status-select">Tipo:</label>
+        <select class="custom-select" (change)="onTypeChange($any($event.target).value)">
+          <option value="">Todos</option>
+          <option *ngFor="let c of (type$ | async)" [value]="c.typeid">
+            {{ c.rtype }}
+          </option>
+        </select>
+      </label>
+
+    </div>
+
+    <div class="table-wrap" *ngIf="rules$ | async as rules; else loading">
+      <table class="users-table" aria-label="Listado de reglas">
+        <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Nombre</th>
+          <th>Categoría</th>
+          <th>Tipo</th>
+          <th>Estado</th>
+          <th>Actualización</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let u of rules; trackBy: trackById"
+          (click)="selectRule(u)"
+          [class.is-selected]="selectedRule?.ruleid === u.ruleid"
+          tabindex="0"
+        >
+          <td>{{ u.ruleid }}</td>
+          <td>{{ u.rulename }}</td>
+          <td>{{ u.category }}</td>
+          <td>{{ u.type}}</td>
+          <td>{{ u.rulestatus}}</td>
+          <td>{{u.updated}}</td>
+        </tr>
+
+        <tr *ngIf="rules.length === 0">
+          <td colspan="6" class="empty">No hay reglas</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loading>
+      <div class="muted">Cargando reglas…</div>
+    </ng-template>
+  </div>
+
+  <br>
+  <div class="users-card">
+
+    <div
+      *ngIf="saveMessage"
+      class="alert"
+      [class.alert-success]="saveMessageType === 'success'"
+      [class.alert-error]="saveMessageType === 'error'"
+    >
+      {{ saveMessage }}
+    </div>
+
+    <h3>Detalle</h3>
+
+    <div *ngIf="selectedRule || isNew; else noSelection">
+      <form [formGroup]="form" class="user-form">
+
+        <label>
+          <span class="lbl">ID</span>
+          <input type="text" formControlName="ruleid">
+        </label>
+
+        <label>
+          <span class="lbl">Nombre</span>
+          <input type="text" formControlName="rulename">
+        </label>
+
+        <label>
+          <span class="lbl">Categoría</span>
+          <select formControlName="categoryid">
+            <option value="" disabled>Selecciona categoría</option>
+            <option *ngFor="let c of (category$ | async)" [value]="c.categoryid">
+              {{ c.category }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          <span class="lbl">Tipo</span>
+          <select formControlName="typeid">
+            <option value="" disabled>Selecciona tipo</option>
+            <option *ngFor="let t of (type$ | async)" [value]="t.typeid">
+              {{ t.rtype }}
+            </option>
+          </select>
+        </label>
+
+        <div class="ai-section">
+          <label class="full-width">
+            <span class="lbl">Prompt</span>
+            <textarea
+              [(ngModel)]="aiPrompt"
+              [ngModelOptions]="{standalone: true}"
+              class="custom-textarea"
+              placeholder="Describe la regla que necesitas..."
+              rows="2"
+            ></textarea>
+          </label>
+
+        </div>
+
+        <label class="full-width"> <span class="lbl">Código regla (SQL)</span>
+          <textarea
+            formControlName="ruletext"
+            class="custom-textarea"
+            placeholder="SELECT * FROM..."
+            rows="6"
+          ></textarea>
+        </label>
+        <label></label>
+
+        <div class="buttons">
+          <button type="button" class="btn-custom" (click)="LLM()" [disabled]="!aiPrompt">
+            Generar con IA
+          </button>
+          <button type="button" class="btn-custom" (click)="addorupdaterule()">
+            Guardar cambios
+          </button>
+          <button type="button" class="btn-custom" (click)="deleterule()">
+            Borrar regla
+          </button>
+          <button type="button" class="btn-custom" (click)="validaterule()">
+            Validar regla
+          </button>
+
+        </div>
+
+      </form>
+    </div>
+
+    <ng-template #noSelection>
+      <div class="muted">Selecciona un usuario de la tabla.</div>
+    </ng-template>
+  </div>
+
+</section>

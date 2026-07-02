@@ -1,0 +1,129 @@
+<section class="conf">
+  <h2>Medallones</h2>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Tablas</h3>
+      <small class="muted">Listado</small>
+
+    </div>
+
+
+    <div class="toolbar">
+      <label class="filter">
+        <label for="status-select">Conexión:</label>
+        <select class="custom-select" (change)="onConnChange($any($event.target).value)">
+          <option value="">Todos</option>
+          <option *ngFor="let c of (conn$ | async)" [value]="c.connectionid">
+            {{ c.connectionname }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div class="table-wrap" *ngIf="{tables: tables$ | async, medallions: medallions$ | async} as data ; else loading">
+      <table class="users-table" aria-label="Listado de usuarios">
+        <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Esquema</th>
+          <th>Nombre</th>
+          <th>Medallón</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let t of data.tables; trackBy: trackById"
+          (click)="selectTable(t)"
+          [class.is-selected]="selectedTable?.tableid === t.tableid"
+          tabindex="0"
+        >
+          <td>{{ t.tableid }}</td>
+          <td>{{ t.schemaname }}</td>
+          <td>{{ t.tablename }}</td>
+          <td>
+            <select
+              class="custom-select"
+              (change)="assignMedallion(t, $any($event.target).value)"
+            >
+              <option value="">Sin asignar</option>
+              <option
+                *ngFor="let m of data.medallions"
+                [value]="m.medallionid"
+                [selected]="m.medallionid === t.medallionid"
+              >
+                {{ m.medallion }}
+              </option>
+            </select></td>
+
+        </tr>
+
+        <tr *ngIf="data.tables?.length === 0">
+          <td colspan="4" class="empty">No hay tablas</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loading>
+      <div class="muted">Cargando tablas…</div>
+    </ng-template>
+  </div>
+  <br>
+
+  <div class="users-card">
+     <div class="users-card__header">
+      <h3>Campos</h3>
+
+    </div>
+
+
+    <div *ngIf="selectedTable else noSelection">
+
+      <div class="table-wrap" *ngIf="columns$ | async as cols; else loading; ">
+        <table class="users-table" aria-label="Listado de campos">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Campo</th>
+            <th>Nulo</th>
+            <th>Clave</th>
+            <th>Tipo</th>
+            <th>Tamaño</th>
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of cols; "
+
+          >
+            <td>{{ c.columnid }}</td>
+            <td>{{ c.columnname }}</td>
+            <td>{{ c.columnnull }}</td>
+            <td>{{ c.columnkey}}</td>
+            <td>{{ c.columntype}}</td>
+            <td>{{ c.columnmax}}</td>
+
+          </tr>
+
+          <tr *ngIf="cols.length === 0">
+            <td colspan="6" class="empty">No hay campos</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando ficheros…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona un grupo de la tabla.</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+</section>

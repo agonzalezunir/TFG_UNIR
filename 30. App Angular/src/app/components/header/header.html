@@ -1,0 +1,35 @@
+<header class="app-header">
+
+  <ng-container *ngIf="appInfo$ | async as info; else loading">
+    <div class="header-left">
+      <h4 class="app-name">{{ info?.appname || 'CoCo' }}</h4>
+    </div>
+
+    <div class="header-center">
+      <div class="db-notes" *ngIf="info?.appnotes">
+        {{ info.appnotes }}
+      </div>
+    </div>
+
+    <div class="header-right">
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+        ⎋
+      </button>
+    </div>
+  </ng-container>
+
+  <ng-template #loading>
+    <div class="header-left">
+      <h4 class="app-name">DamaDQ</h4>
+    </div>
+
+    <div class="header-center"></div>
+
+    <div class="header-right">
+      <button class="logout-btn" (click)="logout()" title="Cerrar sesión" aria-label="Cerrar sesión">
+        ⎋
+      </button>
+    </div>
+  </ng-template>
+
+</header>

@@ -1,0 +1,326 @@
+<section class="conf">
+  <h2>Asignación de reglas</h2>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Tablas</h3>
+      <small class="muted">Listado</small>
+
+    </div>
+
+
+    <div class="toolbar">
+      <label class="filter">
+        <label for="status-select">Conexión:</label>
+        <select class="custom-select" (change)="onConnChange($any($event.target).value)">
+          <option value="">Todos</option>
+          <option *ngFor="let c of (conn$ | async)" [value]="c.connectionid">
+            {{ c.connectionname }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div class="table-wrap" *ngIf="{tables: tables$ | async} as data ; else loading">
+      <table class="users-table" aria-label="Listado de tablas">
+        <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Esquema</th>
+          <th>Nombre</th>
+          <th>Medallón</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let t of data.tables; trackBy: trackById"
+          (click)="selectTable(t)"
+          [class.is-selected]="selectedTable?.tableid === t.tableid"
+          tabindex="0"
+        >
+          <td>{{ t.tableid }}</td>
+          <td>{{ t.schemaname }}</td>
+          <td>{{ t.tablename }}</td>
+          <td>{{ t.medallion }}</td>
+        </tr>
+
+        <tr *ngIf="data.tables?.length === 0">
+          <td colspan="4" class="empty">No hay tablas</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loading>
+      <div class="muted">Cargando tablas…</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Reglas asignadas a tabla</h3>
+    </div>
+
+
+    <div *ngIf="selectedTable else noSelection">
+
+      <div class="table-wrap" *ngIf="assignedTableRules$ | async as tablerules; else loading; ">
+        <table class="users-table" aria-label="Listado de reglas">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Texto</th>
+            <th>Acciones</th>
+
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of tablerules; "
+
+          >
+            <td>{{ c.ruleid }}</td>
+            <td>{{ c.rulename }}</td>
+            <td>{{ c.category }}</td>
+            <td>{{ c.ruletext}}</td>
+            <button class="btn-custom2" title="Desasignar"(click)="deassignTableRule(c)"><span class="material-icons">remove_circle</span></button>
+          </tr>
+
+          <tr *ngIf="tablerules.length === 0">
+            <td colspan="4" class="empty">No hay reglas</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando reglas…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona una tabla de la tabla.</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Reglas disponibles</h3>
+    </div>
+
+
+    <div *ngIf="selectedTable else noSelection">
+
+      <div class="table-wrap" *ngIf="availableTableRules$ | async as tablerules; else loading; ">
+        <table class="users-table" aria-label="Listado de reglas">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Texto</th>
+            <th>Acciones</th>
+
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of tablerules; "
+
+          >
+            <td>{{ c.ruleid }}</td>
+            <td>{{ c.rulename }}</td>
+            <td>{{ c.category }}</td>
+            <td>{{ c.ruletext}}</td>
+            <button class="btn-custom2" title="Asignar"(click)="assignTableRule(c)"><span class="material-icons">add_circle</span></button>
+
+          </tr>
+
+          <tr *ngIf="tablerules.length === 0">
+            <td colspan="4" class="empty">No hay reglas</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando reglas…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona una tabla de la tabla.</div>
+    </ng-template>
+  </div>
+
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Campos</h3>
+
+    </div>
+
+
+    <div *ngIf="selectedTable else noSelection">
+
+      <div class="table-wrap" *ngIf="columns$ | async as cols; else loading; ">
+        <table class="users-table" aria-label="Listado de campos">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Campo</th>
+            <th>Nulo</th>
+            <th>Clave</th>
+            <th>Tipo</th>
+            <th>Tamaño</th>
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of cols; trackBy: trackByIdCol"
+            (click)="selectCol(c)"
+            [class.is-selected]="selectedCol?.columnid === c.columnid"
+            tabindex="0"
+          >
+            <td>{{ c.columnid }}</td>
+            <td>{{ c.columnname }}</td>
+            <td>{{ c.columnnull }}</td>
+            <td>{{ c.columnkey}}</td>
+            <td>{{ c.columntype}}</td>
+            <td>{{ c.columnmax}}</td>
+
+          </tr>
+
+          <tr *ngIf="cols.length === 0">
+            <td colspan="6" class="empty">No hay campos</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando ficheros…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona un grupo de la tabla.</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Reglas asignadas a columna</h3>
+    </div>
+
+
+    <div *ngIf="selectedCol else noSelection">
+
+      <div class="table-wrap" *ngIf="assignedColRules$ | async as tablerules; else loading; ">
+        <table class="users-table" aria-label="Listado de reglas">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Texto</th>
+            <th>Acciones</th>
+
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of tablerules; "
+
+          >
+            <td>{{ c.ruleid }}</td>
+            <td>{{ c.rulename }}</td>
+            <td>{{ c.category }}</td>
+            <td>{{ c.ruletext}}</td>
+            <button class="btn-custom2" title="Desasignar"(click)="deassignColRule(c)"><span class="material-icons">remove_circle</span></button>
+          </tr>
+
+          <tr *ngIf="tablerules.length === 0">
+            <td colspan="4" class="empty">No hay reglas</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando reglas…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona una tabla de la tabla.</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Reglas disponibles</h3>
+    </div>
+
+
+    <div *ngIf="selectedCol else noSelection">
+
+      <div class="table-wrap" *ngIf="availableColRules$ | async as tablerules; else loading; ">
+        <table class="users-table" aria-label="Listado de reglas">
+          <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Texto</th>
+            <th>Acciones</th>
+
+
+          </tr>
+          </thead>
+          <tbody>
+          <tr
+            *ngFor="let c of tablerules; "
+
+          >
+            <td>{{ c.ruleid }}</td>
+            <td>{{ c.rulename }}</td>
+            <td>{{ c.category }}</td>
+            <td>{{ c.ruletext}}</td>
+            <button class="btn-custom2" title="Asignar"(click)="assignColRule(c)"><span class="material-icons">add_circle</span></button>
+
+          </tr>
+
+          <tr *ngIf="tablerules.length === 0">
+            <td colspan="4" class="empty">No hay reglas</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <ng-template #loading>
+        <div class="muted">Cargando reglas…</div>
+      </ng-template>
+    </div>
+    <ng-template #noSelection>
+      <div class="muted">Selecciona una columna de la tabla.</div>
+    </ng-template>
+  </div>
+
+
+  <br>
+
+</section>

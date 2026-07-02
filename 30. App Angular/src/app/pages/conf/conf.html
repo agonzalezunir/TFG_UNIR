@@ -1,0 +1,263 @@
+<section class="conf">
+  <h2>Configuración</h2>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Usuarios</h3>
+      <small class="muted">Listado</small>
+      <button type="button" class="btn-custom" (click)="newUser()">Nuevo usuario</button>
+    </div>
+
+
+    <div class="toolbar">
+      <label class="filter">
+        <label for="status-select">Estado:</label>
+        <select class="custom-select" (change)="onStatusChange($any($event.target).value)">
+          <option value="">Todos</option>
+          <option *ngFor="let s of (statuses$ | async)" [value]="s.userstatusid">
+            {{ s.userstatus }}
+          </option>
+        </select>
+      </label>
+    </div>
+
+    <div class="table-wrap" *ngIf="users$ | async as users; else loading">
+      <table class="users-table" aria-label="Listado de usuarios">
+        <thead>
+          <tr>
+            <th style="width: 90px;">ID</th>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Perfil</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let u of users; trackBy: trackById"
+            (click)="selectUser(u)"
+            [class.is-selected]="selectedUser?.userid === u.userid"
+            tabindex="0"
+          >
+            <td>{{ u.userid }}</td>
+            <td>{{ u.username }}</td>
+            <td>{{ u.name }}</td>
+            <td>{{ u.profilename}}</td>
+            <td>{{ u.userstatus}}</td>
+          </tr>
+
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="empty">No hay usuarios</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loading>
+      <div class="muted">Cargando usuarios…</div>
+    </ng-template>
+  </div>
+  <br>
+  <div class="users-card">
+
+    <div
+      *ngIf="saveMessage"
+      class="alert"
+      [class.alert-success]="saveMessageType === 'success'"
+      [class.alert-error]="saveMessageType === 'error'"
+    >
+      {{ saveMessage }}
+    </div>
+
+    <h3>Detalle</h3>
+
+    <div *ngIf="selectedUser || isNew; else noSelection">
+      <form [formGroup]="form" class="user-form">
+
+        <label>
+          <span class="lbl">ID</span>
+          <input type="text" formControlName="userid">
+        </label>
+
+        <label>
+          <span class="lbl">Usuario</span>
+          <input type="text" formControlName="username">
+        </label>
+
+        <label>
+          <span class="lbl">Nombre</span>
+          <input type="text" formControlName="name">
+        </label>
+
+
+        <label>
+          <span class="lbl">Password</span>
+          <input type="password" formControlName="password">
+        </label>
+
+        <label>
+          <span class="lbl">Perfil</span>
+          <select formControlName="profileid">
+            <option value="" disabled>Selecciona perfil</option>
+            <option *ngFor="let p of (profiles$ | async)" [value]="p.profileid">
+              {{ p.profilename }}
+            </option>
+          </select>
+        </label>
+
+        <label>
+          <span class="lbl">Estado</span>
+          <input type="text" formControlName="userstatus">
+        </label>
+
+        <div class="buttons">
+          <button type="button" class="btn-custom" (click)="saveAndActivate()">
+            Guardar cambios y activar
+          </button>
+
+          <button type="button" class="btn-custom" (click)="disableUser()">
+            Deshabilitar usuario
+          </button>
+
+          <button type="button" class="btn-custom" (click)="logicalDeleteUser()">
+            Borrado lógico
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <ng-template #noSelection>
+      <div class="muted">Selecciona un usuario de la tabla.</div>
+    </ng-template>
+  </div>
+
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Conexiones</h3>
+      <small class="muted">Listado</small>
+      <button type="button" class="btn-custom" (click)="newConn()">Nueva conexión</button>
+    </div>
+
+    <div class="table-wrap" *ngIf="connections$ | async as conns; else loading">
+      <table class="users-table" aria-label="Listado de conexiones">
+        <thead>
+        <tr>
+          <th style="width: 90px;">ID</th>
+          <th>Nombre</th>
+          <th>Servidor</th>
+          <th>Puerto</th>
+          <th>Base de datos</th>
+          <th>Estado</th>
+          <th>Actualización</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let u of conns; trackBy: trackByIdConn"
+          (click)="selectConnection(u)"
+          [class.is-selected]="selectedConn?.connectionid === u.connectionid"
+          tabindex="0"
+        >
+          <td>{{ u.connectionid }}</td>
+          <td>{{ u.connectionname }}</td>
+          <td>{{ u.server }}</td>
+          <td>{{ u.port}}</td>
+          <td>{{ u.database}}</td>
+          <td>{{ u.status}}</td>
+          <td>{{ u.updated}}</td>
+        </tr>
+
+        <tr *ngIf="conns.length === 0">
+          <td colspan="7" class="empty">No hay conexiones</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #loading>
+      <div class="muted">Cargando conexiones…</div>
+    </ng-template>
+  </div>
+  <br>
+  <div class="users-card">
+
+    <div
+      *ngIf="saveMessageConn"
+      class="alert"
+      [class.alert-success]="saveMessageConnType === 'success'"
+      [class.alert-error]="saveMessageConnType === 'error'"
+    >
+      {{ saveMessageConn }}
+    </div>
+
+    <h3>Detalle</h3>
+
+    <div *ngIf="selectedConn || isNewConn; else noSelectionConn">
+      <form [formGroup]="formconn" class="user-form">
+
+        <label>
+          <span class="lbl">ID</span>
+          <input type="text" formControlName="connectionid">
+        </label>
+
+        <label>
+          <span class="lbl">Nombre</span>
+          <input type="text" formControlName="connectionname">
+        </label>
+
+        <label>
+          <span class="lbl">Servidor</span>
+          <input type="text" formControlName="server">
+        </label>
+
+        <label>
+          <span class="lbl">Puerto</span>
+          <input type="text" formControlName="port">
+        </label>
+
+        <label>
+          <span class="lbl">Base de datos</span>
+          <input type="text" formControlName="database">
+        </label>
+
+        <label>
+          <span class="lbl">Usuario</span>
+          <input type="text" formControlName="user">
+        </label>
+
+        <label>
+          <span class="lbl">Password</span>
+          <input type="password" formControlName="password">
+        </label>
+
+        <div class="buttons">
+          <button type="button" class="btn-custom" (click)="saveConnection()">
+            Guardar cambios
+          </button>
+
+          <button type="button" class="btn-custom" (click)="testConnection()">
+            Validar conexión
+          </button>
+
+          <button type="button" class="btn-custom" (click)="extractMetadataConnection()">
+            Extraer Metadata
+          </button>
+
+          <button type="button" class="btn-custom" (click)="deleteConnection()">
+            Borrar
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+    <ng-template #noSelectionConn>
+      <div class="muted">Selecciona una conexión de la tabla.</div>
+    </ng-template>
+  </div>
+
+
+</section>

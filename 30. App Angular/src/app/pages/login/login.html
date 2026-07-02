@@ -1,0 +1,38 @@
+<div class="login-bg d-flex align-items-center justify-content-center">
+
+  <div class="card p-4 shadow" style="width:320px">
+
+    <h3 class="text-center mb-3">Bienvenido a DamaDQ</h3>
+    <p align="center">- DAMA Data Quality -</p>
+
+    <input
+      class="form-control mb-2"
+      placeholder="Usuario"
+      [(ngModel)]="userid"
+    />
+
+    <input
+      class="form-control mb-3"
+      type="password"
+      placeholder="Password"
+      [(ngModel)]="password"
+    />
+
+    <div *ngIf="errorMsg" class="alert alert-danger mt-3">
+      {{ errorMsg }}
+    </div>
+
+    <button
+      class="btn btn-primary w-100"
+      (click)="login()"
+      [disabled]="loading"
+    >
+      <span *ngIf="!loading">Entrar</span>
+      <span *ngIf="loading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+      <span *ngIf="loading">  Cargando...</span>
+    </button>
+
+
+  </div>
+
+</div>

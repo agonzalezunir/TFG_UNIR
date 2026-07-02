@@ -1,0 +1,131 @@
+<section class="conf">
+  <h2>Resultados</h2>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Resumen</h3>
+      <small class="muted">Listado</small>
+    </div>
+
+    <div class="tables-container">
+      <table class="data-grid">
+        <thead>
+        <tr>
+          <th class="col-name">Dimensión DAMA</th>
+          <th *ngFor="let m of MEDALLIONS">{{m}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let row of dataMatrix$ | async">
+          <td class="col-name">{{row.dimension}}</td>
+          <td *ngFor="let cell of row.values" [ngClass]="getScoreColor(cell.value)">
+            {{ cell.value | number:'1.0-0' }}%
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <table class="data-grid">
+        <thead>
+        <tr>
+          <th class="col-name">Volúmenes</th>
+          <th *ngFor="let m of MEDALLIONS">{{m}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let row of dataMatrix2$ | async">
+          <td class="col-name">{{row.dimension}}</td>
+          <td *ngFor="let cell of row.values">{{ cell.value | number:'1.0-0' }}</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="chart-container" style="height: 300px; margin-top: 40px;">
+      <h3>Evolución de Calidad</h3>
+      <canvas baseChart
+              [data]="(chartData$ | async)!"
+              [options]="chartOptions"
+              [type]="'line'">
+      </canvas>
+    </div>
+
+    <div class="chart-container" style="height: 300px; margin-top: 40px;">
+      <h3>Evolución de volumen</h3>
+      <canvas baseChart
+              [data]="(chartDataVol$ | async)!"
+              [options]="chartOptions"
+              [type]="'line'">
+      </canvas>
+    </div>
+    <br><br>
+
+  </div>
+  <br>
+
+  <div class="users-card">
+    <div class="users-card__header">
+      <h3>Detalle por dimensión</h3>
+      <small class="muted">Listado</small>
+    </div>
+
+    <div class="toolbar">
+      <label class="filter">
+        <label for="status-select">Categoría:</label>
+        <select class="custom-select" (change)="onCategoryChange($any($event.target).value)">
+
+          <option *ngFor="let c of (category$ | async)" [value]="c.categoryid">
+            {{ c.category }}
+          </option>
+        </select>
+      </label>
+      </div>
+
+    <div class="chart-container" style="height: 300px; margin-top: 40px;">
+      <h3>Evolución de Calidad</h3>
+      <canvas baseChart
+              [data]="(chartDataCat$ | async)!"
+              [options]="chartOptions"
+              [type]="'line'">
+      </canvas>
+    </div>
+
+    <br><br>
+    <div class="table-wrap" *ngIf="resultsexeccat$ | async as rules; else loading">
+      <table class="users-table" aria-label="Listado de reglas">
+        <thead>
+        <tr>
+          <th>Medallón</th>
+          <th>Tabla</th>
+          <th>Columna</th>
+          <th>Regla</th>
+          <th>Resultado</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr
+          *ngFor="let u of rules;"
+          tabindex="0"
+        >
+          <td>{{ u.medallion }}</td>
+          <td>{{ u.tablename }}</td>
+          <td>{{ u.columnname }}</td>
+          <td>{{ u.rulename }}</td>
+          <td>{{ u.execresult }}</td>
+
+        </tr>
+
+        <tr *ngIf="rules.length === 0">
+          <td colspan="5" class="empty">No hay datos</td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+    <ng-template #loading>
+      <div class="muted">Cargando datos…</div>
+    </ng-template>
+
+  </div>
+
+</section>
+
